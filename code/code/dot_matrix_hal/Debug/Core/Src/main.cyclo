@@ -1,0 +1,14 @@
+../Core/Src/main.c:63:6:max_write	4
+../Core/Src/main.c:86:6:flushBuffer	6
+../Core/Src/main.c:110:6:max7219_cmd	2
+../Core/Src/main.c:122:6:matrixInit	1
+../Core/Src/main.c:131:6:clearDisplay	2
+../Core/Src/main.c:139:6:shiftLeft	2
+../Core/Src/main.c:148:6:shiftchar	4
+../Core/Src/main.c:169:6:scrollString	2
+../Core/Src/main.c:177:6:printString	5
+../Core/Src/main.c:217:5:main	1
+../Core/Src/main.c:277:6:SystemClock_Config	4
+../Core/Src/main.c:321:13:MX_SPI1_Init	2
+../Core/Src/main.c:361:13:MX_GPIO_Init	1
+../Core/Src/main.c:392:6:Error_Handler	1
