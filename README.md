@@ -27,6 +27,7 @@ This folder contains a curated collection of **STM32L433RCT6P peripheral example
 | 1️⃣5️⃣ | `uart`           | UART transmit (polling or interrupt-based) |
 | 1️⃣6️⃣ | `uart_rec`       | UART receive (polling, interrupt, or DMA based) |
 | 1️⃣7️⃣ | `uart_timer`     | UART + Timer integration for time-based UART actions |
+| 1️⃣8️⃣| `uart_hal_usb`     | UART + USB using HAL function to blink the LED |
 
 ---
 
