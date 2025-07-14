@@ -27,6 +27,11 @@ This folder contains a curated collection of **STM32L433RCT6P peripheral example
 | 1️⃣5️⃣ | `uart`           | UART transmit (polling or interrupt-based) |
 | 1️⃣6️⃣ | `uart_rec`       | UART receive (polling, interrupt, or DMA based) |
 | 1️⃣7️⃣ | `uart_timer`     | UART + Timer integration for time-based UART actions |
+| 1️⃣8️⃣ | `external_interrupt_hal`     | Configure EXTI for push-button or signal input to toggle LED (Hardware Abtraction Layer) |
+| 1️⃣9️⃣ | `timer_hal`     | Use of TIM2 with Interrupt concept to toggle led by Hardware Abstraction Layer |
+| 2️⃣0️⃣ | `pwm_timer_hal`     | PWM signal generation using TIM1 , controlling frequency and duty cycle CCR 50% to channel 1 by Hardware Abstraction Layer |
+| 2️⃣1️⃣ | `uart_hal_usb`     | UART by ST-link USB and Recieved data Led_on or led_of to toggle LED again transmitte same data to check (HAL) |
+| 2️⃣2️⃣ | `spi_hal`     | SPI1 is used to transmitte the data of 8bit by HAL |
 
 ---
 
