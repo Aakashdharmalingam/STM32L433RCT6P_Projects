@@ -10,9 +10,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
   2 .rodata       00000040  08001780  08001780  00002780  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   3 .ARM.extab    00000000  080017c0  080017c0  0000300c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   4 .ARM          00000000  080017c0  080017c0  0000300c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   5 .preinit_array 00000000  080017c0  080017c0  0000300c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   6 .init_array   00000004  080017c0  080017c0  000027c0  2**2
@@ -35,17 +35,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 000003f3  00000000  00000000  00008a58  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001fdd7  00000000  00000000  00008e4b  2**0
+ 16 .debug_macro  0001fe02  00000000  00000000  00008e4b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00005c17  00000000  00000000  00028c22  2**0
+ 17 .debug_line   00005cc4  00000000  00000000  00028c4d  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000c156b  00000000  00000000  0002e839  2**0
+ 18 .debug_str    000c15f3  00000000  00000000  0002e911  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000efda4  2**0
+ 19 .comment      00000043  00000000  00000000  000eff04  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000013f8  00000000  00000000  000efde8  2**2
+ 20 .debug_frame  000013f8  00000000  00000000  000eff48  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000045  00000000  00000000  000f11e0  2**0
+ 21 .debug_line_str 00000045  00000000  00000000  000f1340  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -108,17 +108,17 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
  80001d8:	f000 f85e 	bl	8000298 <MX_GPIO_Init>
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // WRITE MODE WHICH MEAN OUTPUT STATE HIGH AND LOW:
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 1);
  80001dc:	2201      	movs	r2, #1
  80001de:	f44f 5100 	mov.w	r1, #8192	@ 0x2000
  80001e2:	4809      	ldr	r0, [pc, #36]	@ (8000208 <main+0x3c>)
  80001e4:	f000 fc18 	bl	8000a18 <HAL_GPIO_WritePin>
-	  HAL_Delay(2000); // 2 seconds
+	  HAL_Delay(2000); //MILLI SEC  2 seconds
  80001e8:	f44f 60fa 	mov.w	r0, #2000	@ 0x7d0
  80001ec:	f000 f990 	bl	8000510 <HAL_Delay>
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 0);

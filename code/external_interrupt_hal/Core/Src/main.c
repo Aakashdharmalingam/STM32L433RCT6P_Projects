@@ -94,6 +94,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // MAIN FUNCTION LED BLINK ON PIN 13
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 1);
 	  HAL_Delay(1000);
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 0);

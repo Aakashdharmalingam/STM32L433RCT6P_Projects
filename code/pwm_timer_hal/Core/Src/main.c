@@ -95,7 +95,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Init(&htim1);
-  TIM1->CCR1 =500;
+  TIM1->CCR1 =500;// COUNT VALUE TO MATCH THE ARR AUTO RELOAD REGISTER
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 
 

@@ -111,6 +111,7 @@ int main(void)
   MX_TIM6_Init();
  80001dc:	f000 f850 	bl	8000280 <MX_TIM6_Init>
   /* USER CODE BEGIN 2 */
+  // INITALIZATION
   HAL_TIM_Base_Init(&htim6);
  80001e0:	4803      	ldr	r0, [pc, #12]	@ (80001f0 <main+0x24>)
  80001e2:	f001 fb27 	bl	8001834 <HAL_TIM_Base_Init>

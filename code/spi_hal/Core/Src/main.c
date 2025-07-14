@@ -56,7 +56,7 @@ static void MX_SPI1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+	int data = 0x80;
 /* USER CODE END 0 */
 
 /**
@@ -90,14 +90,18 @@ int main(void)
   MX_GPIO_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_SPI_Init(&hspi1);
+  HAL_SPI_Init(&hspi1); // iniatilaztaion
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);// state high for ss/cs pin
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_SPI_Transmit(&hspi1, pData, Size, Timeout)
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
+	  HAL_SPI_Transmit(&hspi1, (uint8_t*)&data, 1, 10);
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
+	  HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -169,10 +173,10 @@ static void MX_SPI1_Init(void)
   hspi1.Init.Mode = SPI_MODE_MASTER;
   hspi1.Init.Direction = SPI_DIRECTION_2LINES;
   hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+  hspi1.Init.CLKPolarity = SPI_POLARITY_HIGH;
   hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
   hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
+  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_256;
   hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
   hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
   hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;

@@ -10,9 +10,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
   2 .rodata       00000040  08001524  08001524  00002524  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   3 .ARM.extab    00000000  08001564  08001564  0000300c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   4 .ARM          00000000  08001564  08001564  0000300c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   5 .preinit_array 00000000  08001564  08001564  0000300c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   6 .init_array   00000004  08001564  08001564  00002564  2**2
@@ -35,17 +35,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 000003b5  00000000  00000000  00008038  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001fc38  00000000  00000000  000083ed  2**0
+ 16 .debug_macro  0001fc63  00000000  00000000  000083ed  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000518c  00000000  00000000  00028025  2**0
+ 17 .debug_line   00005267  00000000  00000000  00028050  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000c145e  00000000  00000000  0002d1b1  2**0
+ 18 .debug_str    000c14e6  00000000  00000000  0002d2b7  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000ee60f  2**0
+ 19 .comment      00000043  00000000  00000000  000ee79d  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000012b0  00000000  00000000  000ee654  2**2
+ 20 .debug_frame  000012b0  00000000  00000000  000ee7e0  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 00000041  00000000  00000000  000ef904  2**0
+ 21 .debug_line_str 00000041  00000000  00000000  000efa90  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -101,17 +101,18 @@ int main(void)
   /* Configure the system clock */
   SystemClock_Config();
  80001d4:	f000 f898 	bl	8000308 <SystemClock_Config>
-
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
+  // SPI CLOCK SIGNAL ENABLE
   RCC->APB2ENR |=RCC_APB2ENR_SPI1EN;
  80001d8:	4b49      	ldr	r3, [pc, #292]	@ (8000300 <main+0x134>)
  80001da:	6e1b      	ldr	r3, [r3, #96]	@ 0x60
  80001dc:	4a48      	ldr	r2, [pc, #288]	@ (8000300 <main+0x134>)
  80001de:	f443 5380 	orr.w	r3, r3, #4096	@ 0x1000
  80001e2:	6613      	str	r3, [r2, #96]	@ 0x60
+  // ENABLE CLOCK SIGNAL FOR GPIO PIN
   RCC->AHB2ENR |=RCC_AHB2ENR_GPIOAEN;
  80001e4:	4b46      	ldr	r3, [pc, #280]	@ (8000300 <main+0x134>)
  80001e6:	6cdb      	ldr	r3, [r3, #76]	@ 0x4c
@@ -125,19 +126,22 @@ int main(void)
  80001f6:	f043 0302 	orr.w	r3, r3, #2
  80001fa:	64d3      	str	r3, [r2, #76]	@ 0x4c
 
-  //PA5 sck pin
+  //PA5 SCK pin CONFIG
+  // ALTERNATE FUNCTION in MODER REGISTER
   GPIOA->MODER &= ~GPIO_MODER_MODE5_0;
  80001fc:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
  8000200:	681b      	ldr	r3, [r3, #0]
  8000202:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
  8000206:	f423 6380 	bic.w	r3, r3, #1024	@ 0x400
  800020a:	6013      	str	r3, [r2, #0]
+  // SPEED DEFINE in ospeedr
   GPIOA->OSPEEDR |= (GPIO_OSPEEDER_OSPEEDR5_1 | GPIO_OSPEEDER_OSPEEDR5_0);
  800020c:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
  8000210:	689b      	ldr	r3, [r3, #8]
  8000212:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
  8000216:	f443 6340 	orr.w	r3, r3, #3072	@ 0xc00
  800021a:	6093      	str	r3, [r2, #8]
+  // AFR SET IN SPI ENABLE
   GPIOA->AFR[0] |= GPIO_AFRL_AFSEL5_0 | GPIO_AFRL_AFSEL5_2;
  800021c:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
  8000220:	6a1b      	ldr	r3, [r3, #32]
@@ -145,7 +149,8 @@ int main(void)
  8000226:	f443 03a0 	orr.w	r3, r3, #5242880	@ 0x500000
  800022a:	6213      	str	r3, [r2, #32]
 
-  //PA6 MISO pin
+  //PA6 MISO pin MASTER INPUT SLAVE OUTPUT
+
   GPIOA->MODER &= ~GPIO_MODER_MODE6_0;
  800022c:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
  8000230:	681b      	ldr	r3, [r3, #0]
@@ -165,7 +170,7 @@ int main(void)
  8000256:	f043 63a0 	orr.w	r3, r3, #83886080	@ 0x5000000
  800025a:	6213      	str	r3, [r2, #32]
 
-  // PA7 MOSI pin
+  // PA7 MOSI pin MASTER OUTPUT SLAVE INPUT
   GPIOA->MODER &= ~GPIO_MODER_MODE7_0;
  800025c:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
  8000260:	681b      	ldr	r3, [r3, #0]
@@ -186,7 +191,7 @@ int main(void)
  800028a:	6213      	str	r3, [r2, #32]
 
   //PA4 SS pin default high state
-  GPIOA->MODER &= ~GPIO_MODER_MODE4_0;
+  GPIOA->MODER &= ~GPIO_MODER_MODE4_0; //
  800028c:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
  8000290:	681b      	ldr	r3, [r3, #0]
  8000292:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
@@ -221,13 +226,13 @@ int main(void)
  80002cc:	4a0d      	ldr	r2, [pc, #52]	@ (8000304 <main+0x138>)
  80002ce:	f043 030c 	orr.w	r3, r3, #12
  80002d2:	6053      	str	r3, [r2, #4]
-  SPI1->CR2 |= SPI_CR2_DS_3;
+  SPI1->CR2 |= SPI_CR2_DS_3;// SET 16 BIT value
  80002d4:	4b0b      	ldr	r3, [pc, #44]	@ (8000304 <main+0x138>)
  80002d6:	685b      	ldr	r3, [r3, #4]
  80002d8:	4a0a      	ldr	r2, [pc, #40]	@ (8000304 <main+0x138>)
  80002da:	f443 6300 	orr.w	r3, r3, #2048	@ 0x800
  80002de:	6053      	str	r3, [r2, #4]
-  SPI1->CR1 |= SPI_CR1_SPE;
+  SPI1->CR1 |= SPI_CR1_SPE;// ENABLE SPI
  80002e0:	4b08      	ldr	r3, [pc, #32]	@ (8000304 <main+0x138>)
  80002e2:	681b      	ldr	r3, [r3, #0]
  80002e4:	4a07      	ldr	r2, [pc, #28]	@ (8000304 <main+0x138>)
@@ -238,13 +243,13 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  send_data(0x8000);
+	  send_data(0x8000);// 16BIT DATA
  80002ec:	f44f 4000 	mov.w	r0, #32768	@ 0x8000
  80002f0:	f000 f850 	bl	8000394 <send_data>
 	  HAL_Delay(1000);
  80002f4:	f44f 707a 	mov.w	r0, #1000	@ 0x3e8
  80002f8:	f000 f96e 	bl	80005d8 <HAL_Delay>
-	  send_data(0x8000);
+	  send_data(0x8000);// 16BIT DATA
  80002fc:	bf00      	nop
  80002fe:	e7f5      	b.n	80002ec <main+0x120>
  8000300:	40021000 	.word	0x40021000
@@ -369,7 +374,7 @@ void send_data(int data)
  800039e:	687b      	ldr	r3, [r7, #4]
  80003a0:	60d3      	str	r3, [r2, #12]
 //	  GPIOB->ODR &= ~GPIO_ODR_OD5;
-	while((SPI1->SR & SPI_SR_TXE) != SPI_SR_TXE);
+	while((SPI1->SR & SPI_SR_TXE) != SPI_SR_TXE);// FLAG
  80003a2:	bf00      	nop
  80003a4:	4b06      	ldr	r3, [pc, #24]	@ (80003c0 <send_data+0x2c>)
  80003a6:	689b      	ldr	r3, [r3, #8]

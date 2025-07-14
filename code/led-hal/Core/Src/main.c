@@ -94,8 +94,9 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // WRITE MODE WHICH MEAN OUTPUT STATE HIGH AND LOW:
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 1);
-	  HAL_Delay(2000); // 2 seconds
+	  HAL_Delay(2000); //MILLI SEC  2 seconds
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 0);
 	  HAL_Delay(2000);
     /* USER CODE END WHILE */

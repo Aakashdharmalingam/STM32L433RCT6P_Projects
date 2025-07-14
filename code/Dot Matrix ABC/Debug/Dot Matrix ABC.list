@@ -10,9 +10,9 @@ Idx Name          Size      VMA       LMA       File off  Algn
   2 .rodata       00000110  08001620  08001620  00002620  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, DATA
   3 .ARM.extab    00000000  08001730  08001730  0000300c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   4 .ARM          00000000  08001730  08001730  0000300c  2**0
-                  CONTENTS
+                  CONTENTS, READONLY
   5 .preinit_array 00000000  08001730  08001730  0000300c  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   6 .init_array   00000004  08001730  08001730  00002730  2**2
@@ -35,17 +35,17 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_rnglists 000003b5  00000000  00000000  00008108  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  0001fc3e  00000000  00000000  000084bd  2**0
+ 16 .debug_macro  0001fc69  00000000  00000000  000084bd  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   0000520b  00000000  00000000  000280fb  2**0
+ 17 .debug_line   000052d1  00000000  00000000  00028126  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000c148b  00000000  00000000  0002d306  2**0
+ 18 .debug_str    000c1513  00000000  00000000  0002d3f7  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000ee791  2**0
+ 19 .comment      00000043  00000000  00000000  000ee90a  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000012d8  00000000  00000000  000ee7d4  2**2
+ 20 .debug_frame  000012d8  00000000  00000000  000ee950  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000004c  00000000  00000000  000efaac  2**0
+ 21 .debug_line_str 0000004c  00000000  00000000  000efc28  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -450,61 +450,61 @@ void send_data(uint8_t addr, uint8_t data)
 //	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, 0);
 	  uint16_t write_data =((addr<<8)|data);
  8000438:	79fb      	ldrb	r3, [r7, #7]
- 800043a:	021b      	lsls	r3, r3, #8
- 800043c:	b21a      	sxth	r2, r3
- 800043e:	79bb      	ldrb	r3, [r7, #6]
- 8000440:	b21b      	sxth	r3, r3
- 8000442:	4313      	orrs	r3, r2
- 8000444:	b21b      	sxth	r3, r3
- 8000446:	817b      	strh	r3, [r7, #10]
+ 800043a:	b21b      	sxth	r3, r3
+ 800043c:	021b      	lsls	r3, r3, #8
+ 800043e:	b21a      	sxth	r2, r3
+ 8000440:	79bb      	ldrb	r3, [r7, #6]
+ 8000442:	b21b      	sxth	r3, r3
+ 8000444:	4313      	orrs	r3, r2
+ 8000446:	b21b      	sxth	r3, r3
+ 8000448:	817b      	strh	r3, [r7, #10]
 	for(int i=0;i<4;i++)
- 8000448:	2300      	movs	r3, #0
- 800044a:	60fb      	str	r3, [r7, #12]
- 800044c:	e01f      	b.n	800048e <send_data+0x66>
+ 800044a:	2300      	movs	r3, #0
+ 800044c:	60fb      	str	r3, [r7, #12]
+ 800044e:	e01f      	b.n	8000490 <send_data+0x68>
 	{
 		GPIOA->ODR &= ~GPIO_ODR_OD4;
- 800044e:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
- 8000452:	695b      	ldr	r3, [r3, #20]
- 8000454:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
- 8000458:	f023 0310 	bic.w	r3, r3, #16
- 800045c:	6153      	str	r3, [r2, #20]
+ 8000450:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
+ 8000454:	695b      	ldr	r3, [r3, #20]
+ 8000456:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
+ 800045a:	f023 0310 	bic.w	r3, r3, #16
+ 800045e:	6153      	str	r3, [r2, #20]
 		SPI1->DR = write_data; // data formate for dot matrix
- 800045e:	4a10      	ldr	r2, [pc, #64]	@ (80004a0 <send_data+0x78>)
- 8000460:	897b      	ldrh	r3, [r7, #10]
- 8000462:	60d3      	str	r3, [r2, #12]
+ 8000460:	4a0f      	ldr	r2, [pc, #60]	@ (80004a0 <send_data+0x78>)
+ 8000462:	897b      	ldrh	r3, [r7, #10]
+ 8000464:	60d3      	str	r3, [r2, #12]
 			while((SPI1->SR & SPI_SR_TXE) != SPI_SR_TXE);
- 8000464:	bf00      	nop
- 8000466:	4b0e      	ldr	r3, [pc, #56]	@ (80004a0 <send_data+0x78>)
- 8000468:	689b      	ldr	r3, [r3, #8]
- 800046a:	f003 0302 	and.w	r3, r3, #2
- 800046e:	2b02      	cmp	r3, #2
- 8000470:	d1f9      	bne.n	8000466 <send_data+0x3e>
+ 8000466:	bf00      	nop
+ 8000468:	4b0d      	ldr	r3, [pc, #52]	@ (80004a0 <send_data+0x78>)
+ 800046a:	689b      	ldr	r3, [r3, #8]
+ 800046c:	f003 0302 	and.w	r3, r3, #2
+ 8000470:	2b02      	cmp	r3, #2
+ 8000472:	d1f9      	bne.n	8000468 <send_data+0x40>
 			HAL_Delay(1);
- 8000472:	2001      	movs	r0, #1
- 8000474:	f000 f920 	bl	80006b8 <HAL_Delay>
+ 8000474:	2001      	movs	r0, #1
+ 8000476:	f000 f91f 	bl	80006b8 <HAL_Delay>
 		GPIOA->ODR |= GPIO_ODR_OD4;// wait for set TXE pin
- 8000478:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
- 800047c:	695b      	ldr	r3, [r3, #20]
- 800047e:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
- 8000482:	f043 0310 	orr.w	r3, r3, #16
- 8000486:	6153      	str	r3, [r2, #20]
+ 800047a:	f04f 4390 	mov.w	r3, #1207959552	@ 0x48000000
+ 800047e:	695b      	ldr	r3, [r3, #20]
+ 8000480:	f04f 4290 	mov.w	r2, #1207959552	@ 0x48000000
+ 8000484:	f043 0310 	orr.w	r3, r3, #16
+ 8000488:	6153      	str	r3, [r2, #20]
 	for(int i=0;i<4;i++)
- 8000488:	68fb      	ldr	r3, [r7, #12]
- 800048a:	3301      	adds	r3, #1
- 800048c:	60fb      	str	r3, [r7, #12]
- 800048e:	68fb      	ldr	r3, [r7, #12]
- 8000490:	2b03      	cmp	r3, #3
- 8000492:	dddc      	ble.n	800044e <send_data+0x26>
+ 800048a:	68fb      	ldr	r3, [r7, #12]
+ 800048c:	3301      	adds	r3, #1
+ 800048e:	60fb      	str	r3, [r7, #12]
+ 8000490:	68fb      	ldr	r3, [r7, #12]
+ 8000492:	2b03      	cmp	r3, #3
+ 8000494:	dddc      	ble.n	8000450 <send_data+0x28>
 	}
 //	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, 1);
 
 }
- 8000494:	bf00      	nop
  8000496:	bf00      	nop
- 8000498:	3710      	adds	r7, #16
- 800049a:	46bd      	mov	sp, r7
- 800049c:	bd80      	pop	{r7, pc}
- 800049e:	bf00      	nop
+ 8000498:	bf00      	nop
+ 800049a:	3710      	adds	r7, #16
+ 800049c:	46bd      	mov	sp, r7
+ 800049e:	bd80      	pop	{r7, pc}
  80004a0:	40013000 	.word	0x40013000
 
 080004a4 <Error_Handler>:

@@ -117,7 +117,7 @@ int main(void)
   HAL_TIM_PWM_Init(&htim1);
  80001e4:	4806      	ldr	r0, [pc, #24]	@ (8000200 <main+0x34>)
  80001e6:	f001 fd0b 	bl	8001c00 <HAL_TIM_PWM_Init>
-  TIM1->CCR1 =500;
+  TIM1->CCR1 =500;// COUNT VALUE TO MATCH THE ARR AUTO RELOAD REGISTER
  80001ea:	4b06      	ldr	r3, [pc, #24]	@ (8000204 <main+0x38>)
  80001ec:	f44f 72fa 	mov.w	r2, #500	@ 0x1f4
  80001f0:	635a      	str	r2, [r3, #52]	@ 0x34

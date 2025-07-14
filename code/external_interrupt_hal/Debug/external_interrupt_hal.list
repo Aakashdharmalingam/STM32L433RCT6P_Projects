@@ -108,11 +108,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
  80001d8:	f000 f85e 	bl	8000298 <MX_GPIO_Init>
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // MAIN FUNCTION LED BLINK ON PIN 13
 	  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 1);
  80001dc:	2201      	movs	r2, #1
  80001de:	f44f 5100 	mov.w	r1, #8192	@ 0x2000

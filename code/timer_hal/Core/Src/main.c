@@ -90,6 +90,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM6_Init();
   /* USER CODE BEGIN 2 */
+  // INITALIZATION
   HAL_TIM_Base_Init(&htim6);
   HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
