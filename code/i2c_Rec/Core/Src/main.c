@@ -53,6 +53,8 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+	uint8_t firstdata;
+	uint8_t seconddata;
 
 /* USER CODE END 0 */
 
@@ -64,7 +66,7 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
-	unsigned char firstdata, seconddata;
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -96,32 +98,36 @@ int main(void)
 
   GPIOA->AFR[1] |= GPIO_AFRH_AFSEL10_2 | GPIO_AFRH_AFSEL9_2;
 
+  I2C1->CR1 &=~I2C_CR1_PE;
   I2C1->TIMINGR |= 0x00400D10;
+  I2C1->CR2 |= 0x02<<I2C_CR2_NBYTES_Pos;
+  I2C1->CR2 |= I2C_CR2_AUTOEND;
+  I2C1->CR2 |= 0x90<<I2C_CR2_SADD_Pos;
+  // READ ENABLE MODE
+  I2C1->CR2 |= I2C_CR2_RD_WRN;
   I2C1->CR1 |= I2C_CR1_PE;
+  I2C1->CR2 |= I2C_CR2_START;
+
+
+  while((I2C1->ISR & I2C_ISR_NACKF) != 0);
+
+  while((I2C1->ISR & I2C_ISR_RXNE) == 0);
+
+  firstdata = I2C1->RXDR;
+  while((I2C1->ISR & I2C_ISR_RXNE) == 0);
+
+  seconddata = I2C1->RXDR;
+
+  while((I2C1->ISR & I2C_ISR_STOPF)==0);
+
+  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  I2C1->CR2 |= 0x02<<I2C_CR2_NBYTES_Pos;
-	  I2C1->CR2 |= I2C_CR2_AUTOEND;
-	  I2C1->CR2 |= 0x90<<I2C_CR2_SADD_Pos;
-	  I2C1->CR2 |= I2C_CR2_RD_WRN;
-	  I2C1->CR2 |= I2C_CR2_START;
 
-	  while((I2C1->ISR & I2C_ISR_NACKF) != 0);
-
-	  while((I2C1->ISR & I2C_ISR_RXNE) == 0);
-
-	  firstdata = I2C1->RXDR;
-	  while((I2C1->ISR & I2C_ISR_RXNE) == 0);
-
-	  seconddata = I2C1->RXDR;
-
-	  while((I2C1->ISR & I2C_ISR_STOPF)==0);
-
-	  HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

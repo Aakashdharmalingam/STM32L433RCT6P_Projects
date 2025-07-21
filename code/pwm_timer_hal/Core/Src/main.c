@@ -95,7 +95,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   HAL_TIM_PWM_Init(&htim1);
-  TIM1->CCR1 =500;// COUNT VALUE TO MATCH THE ARR AUTO RELOAD REGISTER
+//  TIM1->CCR1 =50;// COUNT VALUE TO MATCH THE ARR AUTO RELOAD REGISTER
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
 
 
@@ -106,6 +106,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 30);
+	  HAL_Delay(1000);
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 80);
+	  HAL_Delay(1000);
+	  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 130);
+	  HAL_Delay(1000);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -177,9 +183,9 @@ static void MX_TIM1_Init(void)
 
   /* USER CODE END TIM1_Init 1 */
   htim1.Instance = TIM1;
-  htim1.Init.Prescaler = 8000;
+  htim1.Init.Prescaler = 79;
   htim1.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim1.Init.Period = 1000;
+  htim1.Init.Period = 999;
   htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim1.Init.RepetitionCounter = 0;
   htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;

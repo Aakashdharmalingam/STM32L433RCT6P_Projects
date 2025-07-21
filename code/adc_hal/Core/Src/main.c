@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,7 +56,7 @@ static void MX_ADC1_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-uint16_t val;
+float data,R,temperature;
 /* USER CODE END 0 */
 
 /**
@@ -99,7 +99,9 @@ int main(void)
   {
 	  HAL_ADC_Start(&hadc1);
 	  HAL_ADC_PollForConversion(&hadc1, 20);
-	  val = HAL_ADC_GetValue(&hadc1);
+	  data = HAL_ADC_GetValue(&hadc1);
+	  R = (4095.0 / data - 1.0) * 10000.0;
+	  temperature = 1.0 / (log(R / 10000.0) / 3950.0 + 1.0 / (273.15 + 25.0)) - 273.15;
 	  HAL_Delay(50);
     /* USER CODE END WHILE */
 

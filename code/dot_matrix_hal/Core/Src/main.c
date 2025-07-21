@@ -245,7 +245,7 @@ int main(void)
   matrixInit();
 
   clearDisplay();
-  printString("12:34");
+//  printString("12:34");
 
 //  for (int i=1; i<=8; i++)
 //  {
@@ -260,7 +260,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	  scrollString((uint8_t*)" GOOD THINGS TAKE TIME !!!    ", 100);
+	  scrollString((uint8_t*)" GOOD THINGS TAKE TIME !!!    ", 100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

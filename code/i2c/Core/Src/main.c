@@ -85,18 +85,17 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
-  RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
-  RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
+  // ENABLE I2C CLOCK SIGNAL
+  	RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
+  	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 
-  GPIOA->MODER &= ~GPIO_MODER_MODE10_0;
-  GPIOA->MODER &= ~GPIO_MODER_MODE9_0;
+  	GPIOA->MODER &= ~(GPIO_MODER_MODE9_0 | GPIO_MODER_MODE10_0);
+  	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9_0 | GPIO_OSPEEDER_OSPEEDR9_1;
+  	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_0 | GPIO_OSPEEDER_OSPEEDR10_1;
+  	GPIOA->AFR[1] |= GPIO_AFRH_AFSEL10_2 | GPIO_AFRH_AFSEL9_2;
 
-  GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_0 | GPIO_OSPEEDER_OSPEEDR10_1 | GPIO_OSPEEDER_OSPEEDR9_0 | GPIO_OSPEEDER_OSPEEDR9_1 ;
-
-  GPIOA->AFR[1] |= GPIO_AFRH_AFSEL10_2 | GPIO_AFRH_AFSEL9_2 ;
-
-  I2C1->TIMINGR |= 0x00400D10;
-  I2C1->CR1 |= I2C_CR1_PE;
+  	I2C1->TIMINGR = 0X00400D10; //100KHZ
+  	I2C1->CR1 |= I2C_CR1_PE;
 
   /* USER CODE END 2 */
 
@@ -104,24 +103,31 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  I2C1->CR2 |= 0x02<<I2C_CR2_NBYTES_Pos | I2C_CR2_AUTOEND;
-	  I2C1->CR2 |= 0x90<<I2C_CR2_SADD_Pos;
-	  I2C1->CR2 &= ~I2C_CR2_RD_WRN;
-	  I2C1->CR2 |= I2C_CR2_START;
+	  // NBYTES 2 BYTES BY POS SHIFT
+	  // AUTOEND MODE
+	  // Set CR2 all at once with correct address, nbytes, autoend
+   // 7-bit address shifted
+	  	  	I2C1->CR2 |= 2 << I2C_CR2_NBYTES_Pos | I2C_CR2_AUTOEND; //16
+	  		I2C1->CR2 |= 0x90 << I2C_CR2_SADD_Pos;// 0b100 11110
+	  		I2C1->CR2 &= ~I2C_CR2_RD_WRN;
+	  		I2C1->CR2 |= I2C_CR2_START; ///START-> SLAVE ADDRESS-> WITH WRITE -> WAIT FOR ACK FROM SLAVE
+	  		//NACK = 1 -> SLAVE IS NOT MATCH
+	  		//NACK = 0 -> SLAVE IS MATCH
+	  		while ((I2C1->ISR & I2C_ISR_NACKF) != 0)
+	  			;		//0
+	  		while ((I2C1->ISR & I2C_ISR_TXIS) == 0)
+	  			;		///1
+	  		I2C1->TXDR = 0x0a;		//analog data output enable
 
-	  while((I2C1->ISR & I2C_ISR_NACKF) != 0);
+	  		while ((I2C1->ISR & I2C_ISR_TXIS) == 0)
+	  			;		///1
+	  		I2C1->TXDR = 0x0b;		//vref -> 4.5v
 
-	  while((I2C1->ISR & I2C_ISR_TXIS) ==0);
+	  		while ((I2C1->ISR & I2C_ISR_STOPF) == 0)
+	  					;		///1
 
-	  I2C1->TXDR |= 0xAA;
+	  		HAL_Delay(1000);
 
-	  while((I2C1->ISR & I2C_ISR_TXIS) ==0);
-
-	  I2C1->TXDR |= 0xAA;
-
-	  while((I2C1->ISR & I2C_ISR_STOPF)==0);
-
-	  HAL_Delay(1000);
 
     /* USER CODE END WHILE */
 
