@@ -69,6 +69,8 @@ This project demonstrates how individual STM32 basic concepts can come together 
 
 **✅ This project is added as part of my STM32 Basics Series to show practical implementation after learning the fundamentals.**
 
+---
+
 ## 🔧 Development Environment
 
 - **MCU**: STM32L433RCT6P  
