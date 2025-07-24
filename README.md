@@ -51,7 +51,8 @@ This project demonstrates how individual STM32 basic concepts can come together 
 ---
 
 ### ✅ Block Daigram:
-!(code/IMAGE/PROJECT-2.png)
+![Alt Text](code/IMAGE/PROJECT-2.png)
+
 
 ---
 
