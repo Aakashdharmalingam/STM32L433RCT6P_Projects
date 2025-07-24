@@ -50,6 +50,11 @@ This project demonstrates how individual STM32 basic concepts can come together 
 
 ---
 
+### ✅ Block Daigram:
+!(.code\IMAGE\PROJECT-1.png)
+
+---
+
 ### ✅ Features Covered from Basics:
 - GPIO control for buzzer
 - ADC reading with thermistor (Grove Temperature Sensor)
