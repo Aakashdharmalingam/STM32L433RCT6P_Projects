@@ -36,15 +36,38 @@ This folder contains a curated collection of **STM32L433RCT6P peripheral example
 | 2️⃣4️⃣ | `i2c_hal`     | HALF DUPLEX of I2C communication done by HAL |
 
 ---
+
 ## 🧩 Projects Covered
 
 ## 📁 Smart Access Control System with Display Logging — STM32 Project
 
 After completing the basic concepts of STM32 — like **GPIO handling**, **UART communication**, **PWM generation**, **EXTERNAL Interrupt**, **ADC reading**, **SPI communication** and **I2C interfacing** — I applied these skills to build this integrated project.
 
-This **Smart Access Control System** combines multiple STM32 peripherals into a real-world application.  
-The system detects a person, checks temperature, controls a door using a servo motor, and logs access data into EEPROM.  
-It also displays the access status on a **Dot Matrix Display** and transmits logs via **UART**.
+🔹 How It Works in This Scenario:
+
+Person Detection:
+An IR sensor detects when someone approaches the gate.
+
+Temperature Screening:
+The system reads the body temperature using a Grove NTC thermistor via ADC.
+
+Decision Making:
+
+If the temperature is within a safe range (e.g., 36.5°C–37.5°C),
+✅ The servo motor opens the door automatically.
+✅ A message “Access Granted” scrolls on the Dot Matrix Display.
+✅ The entry is logged into EEPROM and the count is updated via UART.
+
+If the temperature is out of range,
+❌ Access is denied, and an alert buzzer may sound.
+
+Logging & Monitoring:
+Entry logs can be reviewed through UART on a PC or logged into a terminal.
+
+---
+
+✅ Example Application: Corporate Office Entry Management System
+In a corporate office environment, managing secure and health-conscious entry for employees and visitors is critical — especially in a post-pandemic world. This Smart Access Control System can be deployed at the main entrance gate of the office to automate and enhance access safety.
 
 This project demonstrates how individual STM32 basic concepts can come together in a practical embedded system.
 
