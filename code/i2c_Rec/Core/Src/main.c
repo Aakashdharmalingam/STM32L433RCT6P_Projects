@@ -53,9 +53,9 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-	uint8_t firstdata;
-	uint8_t seconddata;
-
+	uint8_t firstdata = 0;
+	uint8_t seconddata = 0;
+	int count;
 /* USER CODE END 0 */
 
 /**
@@ -96,38 +96,57 @@ int main(void)
   GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_0 | GPIO_OSPEEDER_OSPEEDR10_1;
   GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9_0 | GPIO_OSPEEDER_OSPEEDR9_1;
 
+  GPIOA->OTYPER |= ( GPIO_OTYPER_OT10 | GPIO_OTYPER_OT9 );
+  GPIOA->PUPDR |= (GPIO_PUPDR_PUPD9_0 | GPIO_PUPDR_PUPD10_0);
+
   GPIOA->AFR[1] |= GPIO_AFRH_AFSEL10_2 | GPIO_AFRH_AFSEL9_2;
 
-  I2C1->CR1 &=~I2C_CR1_PE;
+
   I2C1->TIMINGR |= 0x00400D10;
-  I2C1->CR2 |= 0x02<<I2C_CR2_NBYTES_Pos;
-  I2C1->CR2 |= I2C_CR2_AUTOEND;
-  I2C1->CR2 |= 0x90<<I2C_CR2_SADD_Pos;
-  // READ ENABLE MODE
-  I2C1->CR2 |= I2C_CR2_RD_WRN;
   I2C1->CR1 |= I2C_CR1_PE;
-  I2C1->CR2 |= I2C_CR2_START;
+
+
+  // RECEIVE THE DATA FROM EEPROM MAKE SURE SEND ADDRESS OF MEMORY AND RECIEVE THE DATA
+  I2C1->CR2 |= 0x02<<I2C_CR2_NBYTES_Pos; // 2 bytes
+  I2C1->CR2 |= I2C_CR2_AUTOEND; // automatice stop
+  I2C1->CR2 |= 0xA0<<I2C_CR2_SADD_Pos; // address slave
+  //WRITE ENABLE MODE
+  I2C1->CR2 &= ~I2C_CR2_RD_WRN;
+  I2C1->CR2 |= I2C_CR2_START; // START ENABLE
 
 
   while((I2C1->ISR & I2C_ISR_NACKF) != 0);
 
+  while ((I2C1->ISR & I2C_ISR_TXIS) == 0);		///1 BYTES
+  I2C1->TXDR = 0x00;
+
+  while ((I2C1->ISR & I2C_ISR_TXIS) == 0);		///1 BYTES
+  I2C1->TXDR = 0x00;
+
+  while((I2C1->ISR & I2C_ISR_STOPF)==0);   // CHECK AUTOMATICE FLAG
+
+  HAL_Delay(5);// WAIT
+
+  I2C1->CR2 =0; // clear
+  I2C1->CR2 |= 0x01<<I2C_CR2_NBYTES_Pos; // 1 BYTES
+  I2C1->CR2 |= I2C_CR2_AUTOEND; // AUTOMATICE FLAG
+  I2C1->CR2 |= 0xA0<<I2C_CR2_SADD_Pos; // SLAVE ADDRESS
+    // READ ENABLE MODE
+  I2C1->CR2 |= I2C_CR2_RD_WRN;
+  I2C1->CR2 |= I2C_CR2_START;
+
+
   while((I2C1->ISR & I2C_ISR_RXNE) == 0);
+  firstdata = I2C1->RXDR;// DATA RECIEVE
 
-  firstdata = I2C1->RXDR;
-  while((I2C1->ISR & I2C_ISR_RXNE) == 0);
-
-  seconddata = I2C1->RXDR;
-
-  while((I2C1->ISR & I2C_ISR_STOPF)==0);
-
-  HAL_Delay(1000);
+  while((I2C1->ISR & I2C_ISR_STOPF)==0);   // CHECK AUTOMATICE FLAG
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-
+	  count++;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

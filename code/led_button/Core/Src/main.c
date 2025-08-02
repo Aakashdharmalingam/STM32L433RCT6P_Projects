@@ -99,6 +99,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  //CONDITION
 	  if((GPIOC->IDR & GPIO_IDR_ID13) == GPIO_IDR_ID13 ) //WHEN BUTTON PRESSED Set 1
 	  {
 		GPIOB->ODR |= GPIO_IDR_ID13; // LED ON Set

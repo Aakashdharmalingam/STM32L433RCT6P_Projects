@@ -98,6 +98,7 @@ int main(void)
 
   	//EXTERNAL INTERRUPT
   	//PB4
+  	// DEFAULT STATE OF INTERRUPT MODE IS ALTERNATE MODE
   	EXTI->IMR1 |= EXTI_IMR1_IM4;  //UNMASKED
   	EXTI->RTSR1 |= EXTI_RTSR1_RT4; // rising edge
   	SYSCFG->EXTICR[1] |= SYSCFG_EXTICR2_EXTI4_PB ;  //WHICH PIN
@@ -108,6 +109,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  // ODR TO WRITE , IDR TO READ
 	  // Main program Led blinking
 	  GPIOB->ODR |= GPIO_ODR_OD8; // set state high
 	  HAL_Delay(1000);

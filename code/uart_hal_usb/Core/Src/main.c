@@ -57,6 +57,7 @@ static void MX_USART2_UART_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 	char re_index[6];
+	uint8_t value_index[7] ="HELLO\n";
 /* USER CODE END 0 */
 
 /**
@@ -100,7 +101,9 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_UART_Receive_IT(&huart2, re_index, 6);
+	  HAL_UART_Transmit(&huart2, value_index, 7, 100);
+	  HAL_Delay(500);
+//	  HAL_UART_Receive_IT(&huart2, re_index, 6);
   }
   /* USER CODE END 3 */
 }

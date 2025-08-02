@@ -53,7 +53,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-int data;
+int data; // 4 BYTES
 /* USER CODE END 0 */
 
 /**
@@ -114,10 +114,10 @@ int main(void)
   {
 	  // ADC 12BIT SAR ADC 4096 value
 	  ADC1->CR |= ADC_CR_ADSTART;// ADC START
-	  while((ADC1->ISR & ADC_ISR_EOC)==0);
+	  while((ADC1->ISR & ADC_ISR_EOC)==0); // END OF CONVERSION
 	  ADC1->ISR |= ADC_ISR_EOC;// FLAG
 	  data = ADC1->DR;// DATA
-	  HAL_Delay(100);// wait
+	  HAL_Delay(100);// EVERY 100 MILLI SECONDS
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

@@ -53,7 +53,7 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+int count;
 /* USER CODE END 0 */
 
 /**
@@ -89,46 +89,58 @@ int main(void)
   	RCC->APB1ENR1 |= RCC_APB1ENR1_I2C1EN;
   	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN;
 
-  	GPIOA->MODER &= ~(GPIO_MODER_MODE9_0 | GPIO_MODER_MODE10_0);
+  	// AFTERNATE MODE IN GPIO
+  	GPIOA->MODER &= ~GPIO_MODER_MODE9_0;
+  	GPIOA->MODER &= ~GPIO_MODER_MODE10_0;
+  	GPIOA->MODER |= GPIO_MODER_MODE9_1;
+  	GPIOA->MODER |= GPIO_MODER_MODE10_1;
+  	// MAXIMUM SPEED
   	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR9_0 | GPIO_OSPEEDER_OSPEEDR9_1;
   	GPIOA->OSPEEDR |= GPIO_OSPEEDER_OSPEEDR10_0 | GPIO_OSPEEDER_OSPEEDR10_1;
+  	// OPEN DRAIN
+  	GPIOA->OTYPER |= ( GPIO_OTYPER_OT10 | GPIO_OTYPER_OT9 );
+  	// ENABLE INTERNAL PULL-UP
+  	GPIOA->PUPDR |= (GPIO_PUPDR_PUPD9_0 | GPIO_PUPDR_PUPD10_0);
+  	// ENABLE I2C PIN IN AFTERNATE FUNCTION
   	GPIOA->AFR[1] |= GPIO_AFRH_AFSEL10_2 | GPIO_AFRH_AFSEL9_2;
 
   	I2C1->TIMINGR = 0X00400D10; //100KHZ
-  	I2C1->CR1 |= I2C_CR1_PE;
+  	I2C1->CR1 |= I2C_CR1_PE;// ENABLE I2C
 
+	  // NBYTES 2 BYTES BY POS SHIFT
+	  // AUTOEND MODE
+	  // Set CR2 all at once with correct address, nbytes, autoend
+  	// 7-bit address shifted
+	  ///I2C_WRITE
+	 I2C1->CR2 |= 0x03 << I2C_CR2_NBYTES_Pos | I2C_CR2_AUTOEND; // 3 BYTES
+	 I2C1->CR2 |= 0xA0 << I2C_CR2_SADD_Pos;// 0b100 1000 0
+	 // WRITE ENABLE
+	 I2C1->CR2 &= ~I2C_CR2_RD_WRN;
+	 I2C1->CR2 |= I2C_CR2_START; ///START-> SLAVE ADDRESS-> WITH WRITE -> WAIT FOR ACK FROM SLAVE
+	 //NACK = 1 -> SLAVE IS NOT MATCH
+	 //NACK = 0 -> SLAVE IS MATCH
+	 while ((I2C1->ISR & I2C_ISR_NACKF) != 0);		//0
+
+	 // ADDRESS OF EEPROM IN 2 BYTES
+	 while ((I2C1->ISR & I2C_ISR_TXIS) == 0);		///1
+	 I2C1->TXDR = 0x00;		// 0000 0000 8 bit
+
+	 while ((I2C1->ISR & I2C_ISR_TXIS) == 0);		///1
+	 I2C1->TXDR = 0x00;		//
+
+	 while ((I2C1->ISR & I2C_ISR_TXIS) == 0);		/// data 1 BYTES
+	 I2C1->TXDR = 0x03;
+
+	 while ((I2C1->ISR & I2C_ISR_STOPF) == 0);		///CHECK THE AUTOEND
+
+	  HAL_Delay(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  // NBYTES 2 BYTES BY POS SHIFT
-	  // AUTOEND MODE
-	  // Set CR2 all at once with correct address, nbytes, autoend
-   // 7-bit address shifted
-	  	  	I2C1->CR2 |= 2 << I2C_CR2_NBYTES_Pos | I2C_CR2_AUTOEND; //16
-	  		I2C1->CR2 |= 0x90 << I2C_CR2_SADD_Pos;// 0b100 11110
-	  		I2C1->CR2 &= ~I2C_CR2_RD_WRN;
-	  		I2C1->CR2 |= I2C_CR2_START; ///START-> SLAVE ADDRESS-> WITH WRITE -> WAIT FOR ACK FROM SLAVE
-	  		//NACK = 1 -> SLAVE IS NOT MATCH
-	  		//NACK = 0 -> SLAVE IS MATCH
-	  		while ((I2C1->ISR & I2C_ISR_NACKF) != 0)
-	  			;		//0
-	  		while ((I2C1->ISR & I2C_ISR_TXIS) == 0)
-	  			;		///1
-	  		I2C1->TXDR = 0x0a;		//analog data output enable
-
-	  		while ((I2C1->ISR & I2C_ISR_TXIS) == 0)
-	  			;		///1
-	  		I2C1->TXDR = 0x0b;		//vref -> 4.5v
-
-	  		while ((I2C1->ISR & I2C_ISR_STOPF) == 0)
-	  					;		///1
-
-	  		HAL_Delay(1000);
-
-
+	  count++;
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -198,8 +210,7 @@ void Error_Handler(void)
   }
   /* USER CODE END Error_Handler_Debug */
 }
-
-#ifdef  USE_FULL_ASSERT
+#ifdef USE_FULL_ASSERT
 /**
   * @brief  Reports the name of the source file and the source line number
   *         where the assert_param error has occurred.

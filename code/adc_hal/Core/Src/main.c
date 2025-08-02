@@ -97,11 +97,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_ADC_Start(&hadc1);
-	  HAL_ADC_PollForConversion(&hadc1, 20);
-	  data = HAL_ADC_GetValue(&hadc1);
-	  R = (4095.0 / data - 1.0) * 10000.0;
-	  temperature = 1.0 / (log(R / 10000.0) / 3950.0 + 1.0 / (273.15 + 25.0)) - 273.15;
+	  HAL_ADC_Start(&hadc1);// START ADC
+	  HAL_ADC_PollForConversion(&hadc1, 20);// START CONVERSION
+	  data = HAL_ADC_GetValue(&hadc1);// DATA
+	  R = (4095.0 / data - 1.0) * 10000.0;// NORMALIZE
+	  temperature = 1.0 / (log(R / 10000.0) / 3950.0 + 1.0 / (273.15 + 25.0)) - 273.15;// TEMP FORMULA
 	  HAL_Delay(50);
     /* USER CODE END WHILE */
 

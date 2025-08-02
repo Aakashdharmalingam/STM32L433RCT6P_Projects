@@ -85,6 +85,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   /* USER CODE BEGIN 2 */
+  //PB13
   RCC->AHB2ENR |= RCC_AHB2ENR_GPIOBEN; // Enable GPIOB clock signal set
   GPIOB->MODER |= GPIO_MODER_MODE13_0; // output PB13
   GPIOB->MODER &= ~(GPIO_MODER_MODE13_1);

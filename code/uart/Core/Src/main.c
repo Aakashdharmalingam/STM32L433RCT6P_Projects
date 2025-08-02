@@ -113,7 +113,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  USART3->TDR = 0xAA;	//0b1010 1010 DATA
+	  USART3->TDR = 0xAA;	//0b1010 1010 DATA 8 BIT
 	  while ((USART3->ISR & USART_ISR_TC) == 0);
 	  USART3->ICR |= USART_ICR_TCCF;
 	  HAL_Delay(1000);

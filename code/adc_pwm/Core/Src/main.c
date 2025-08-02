@@ -101,7 +101,7 @@ int main(void)
     ADC1->CR |= ADC_CR_ADEN;
     while((ADC1->ISR & ADC_ISR_ADRDY)==0);
 
-    //PWM CONFIG
+    //PWM CONFIG TIMER
     RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN; //CLOCK SIGNAL GPIO PIN
     RCC->APB1ENR1 |= RCC_APB1ENR1_TIM2EN;// CLOCK SIGNAL TIMER2 PIN
 
@@ -112,7 +112,7 @@ int main(void)
 
     TIM2->PSC = 400;/// 10Hz -> 100ms period
     TIM2->ARR = 1000+1;
-    TIM2->CCR1 = 0;///0 to 1000
+    TIM2->CCR1 = 0;///0 to 1000 DUTY CYCLE
     TIM2->CCMR1 |= TIM_CCMR1_OC1M_1 | TIM_CCMR1_OC1M_2 | TIM_CCMR1_OC1PE;
     TIM2->CCER |= TIM_CCER_CC1E;
     TIM2->CR1 |= TIM_CR1_CEN;//ENABLE COUNTER
@@ -124,9 +124,9 @@ int main(void)
   while (1)
   {
 	  ADC1->CR |= ADC_CR_ADSTART;// START ADC
-	  while((ADC1->ISR & ADC_ISR_EOC)==0);
-	  ADC1->ISR |= ADC_ISR_EOC;
-	  data = ADC1->DR;
+	  while((ADC1->ISR & ADC_ISR_EOC)==0);// END OF CONVERSION
+	  ADC1->ISR |= ADC_ISR_EOC; // SET THE FLAG
+	  data = ADC1->DR; // DATA
 
 		//CCR1 = 0 to 1000
 		//data = 0 to 4095
