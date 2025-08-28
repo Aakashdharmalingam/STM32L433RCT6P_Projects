@@ -22,6 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <string.h>
+#include <stdio.h>
+#include <stdbool.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -40,6 +42,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -49,6 +52,7 @@ UART_HandleTypeDef huart2;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
+static void MX_USART1_UART_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
@@ -56,8 +60,16 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-	char re_index[6];
-	uint8_t value_index[7] ="HELLO\n";
+//char rxBuffer[500];
+uint8_t rxIndex = 0;
+void esp01_send(char *cmd, uint32_t delay);
+void send_esp(const char *cmd);
+int send_esp_wait(const char *cmd, const char *expected, uint32_t timeout_ms);
+void UART_StartReceive(void);
+uint8_t rxData,count=0,flag=0;           // single byte receive
+unsigned char rxBuffer[200];       // message buffer
+
+
 /* USER CODE END 0 */
 
 /**
@@ -89,8 +101,20 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART1_UART_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
+  UART_StartReceive();
+  send_esp_wait("AT\r\n","OK",1500);   // Check ESP ready
+////  HAL_UART_Receive_IT(&huart1, &rxData, 1);
+  send_esp_wait("AT+RST\r\n","OK",1500);// Restart
+  send_esp_wait("AT+CWMODE=1\r\n","OK", 2500); // Set WiFi Station mode
+  send_esp_wait("AT+CWJAP=\"Nord\",\"12345678\"\r\n","OK", 10000); // Connect WiFi (big delay needed!)
+
+  send_esp_wait("AT+MQTTUSERCFG=0,1,\"ESPAakash\",\"\",\"\",0,0,\"\"\r\n","OK", 4000); // MQTT user config
+  send_esp_wait("AT+MQTTCONN=0,\"test.mosquitto.org\",1883,0\r\n","OK", 10000); // Connect MQTT broker
+  send_esp_wait("AT+MQTTSUB=0,\"stm32/led\",1\r\n","OK", 2000); // Subscribe topic
+   // Publish test message
 
   /* USER CODE END 2 */
 
@@ -98,12 +122,26 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	  count++;
+	  flag=1;
+      	if (strstr((char*)rxBuffer, "ON\r\n"))
+      	{
+      			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 1);
+      	}
+      	else if (strstr((char*)rxBuffer, "OFF\r\n"))
+        	{
+        			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 0);
+        	}
+
+//	send_esp_wait("AT+MQTTPUB=0,\"stm32/led\",\"ON\",1,0\r\n","OK", 2000);
+//	HAL_Delay(2000);
+//	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, 0);
+//	send_esp_wait("AT+MQTTPUB=0,\"stm32/led\",\"OFF\",1,0\r\n","OK", 2000);
+//	HAL_Delay(2000);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  HAL_UART_Transmit(&huart2, value_index, 7, 100);
-	  HAL_Delay(500);
-//	  HAL_UART_Receive_IT(&huart2, re_index, 6);
   }
   /* USER CODE END 3 */
 }
@@ -127,10 +165,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_MSI;
-  RCC_OscInitStruct.MSIState = RCC_MSI_ON;
-  RCC_OscInitStruct.MSICalibrationValue = 0;
-  RCC_OscInitStruct.MSIClockRange = RCC_MSIRANGE_6;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -141,7 +178,7 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_MSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
@@ -150,6 +187,41 @@ void SystemClock_Config(void)
   {
     Error_Handler();
   }
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
 }
 
 /**
@@ -201,16 +273,17 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, GPIO_PIN_13, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : PA5 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5;
+  /*Configure GPIO pin : PB13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -218,25 +291,58 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void UART_StartReceive(void) {
+    HAL_UART_Receive_IT(&huart1, &rxData, 1);
+}
+void esp01_send(char *cmd, uint32_t delay_ms) {
+    HAL_UART_Transmit(&huart1, (uint8_t*)cmd, strlen(cmd), HAL_MAX_DELAY);
+    HAL_Delay(delay_ms);
+      // simple delay before next command
+}
+void send_esp(const char *cmd) {
+    HAL_UART_Transmit(&huart1, (uint8_t*)cmd, strlen(cmd), 100);
+}
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart == &huart2)
-	{
-		if(!strcmp(re_index , "led_on"))
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 1);
-		}
-		else
-		{
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, 0);
-		}
-		HAL_UART_Transmit(&huart2, re_index, 6, 10);
-		for(int i=0;i<6;i++)
-		{
-			re_index[i]=0;//
-		}
-	}
+    if (huart->Instance == USART1)
+    {
+        if (rxIndex < sizeof(rxBuffer) - 1) {
+            rxBuffer[rxIndex++] = rxData;
+            rxBuffer[rxIndex] = '\0'; // keep it null terminated
+        }
+
+        if(flag == 1)
+        {
+        	if (strstr((char*)rxBuffer, "\r\n")) {
+            // Parse topic & payload here
+            printf("MQTT Message: %s\r\n", rxBuffer);
+            rxIndex = 0; // reset after processing
+//            memset(rxBuffer, 0, sizeof(rxBuffer));
+        }
+        }
+
+        HAL_UART_Receive_IT(&huart1, &rxData, 1); // restart interrupt
+    }
 }
+int send_esp_wait(const char *cmd, const char *expected, uint32_t timeout_ms) {
+    char *ptr;
+    rxIndex = 0;              // clear buffer
+    memset(rxBuffer, 0, sizeof(rxBuffer)); //SEt TO ZERO VALUE
+
+    send_esp(cmd);            // send AT command
+
+    uint32_t tickstart = HAL_GetTick();
+        while ((HAL_GetTick() - tickstart) < timeout_ms) {
+            ptr = strstr((char *)rxBuffer, expected);
+            if (ptr != NULL) {
+            	printf("%s",rxBuffer);
+                return 1; // Found expected response
+            }
+    }
+    return 0; // timeout
+}
+
+
 /* USER CODE END 4 */
 
 /**

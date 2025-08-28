@@ -257,8 +257,8 @@ static void MX_GPIO_Init(void)
  80002a6:	609a      	str	r2, [r3, #8]
  80002a8:	60da      	str	r2, [r3, #12]
  80002aa:	611a      	str	r2, [r3, #16]
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
+  /* USER CODE BEGIN MX_GPIO_Init_1 */
+  /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOB_CLK_ENABLE();
@@ -299,8 +299,8 @@ static void MX_GPIO_Init(void)
  80002e6:	4804      	ldr	r0, [pc, #16]	@ (80002f8 <MX_GPIO_Init+0x60>)
  80002e8:	f000 fa1c 	bl	8000724 <HAL_GPIO_Init>
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
+  /* USER CODE BEGIN MX_GPIO_Init_2 */
+  /* USER CODE END MX_GPIO_Init_2 */
 }
  80002ec:	bf00      	nop
  80002ee:	3718      	adds	r7, #24
